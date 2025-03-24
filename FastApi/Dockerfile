@@ -2,8 +2,6 @@ FROM python:3.11
 LABEL app="BOTO3 with FastAPI"
 LABEL maintainer="Vamsi Chilukuri"
 LABEL email="chilukurivamsi2@gmail.com"
-ENV AWS_ACCESS_KEY_ID=SAMPLEKEYID
-ENV AWS_SECRET_ACCESS_KEY=SAMEPLSECRETKEY
 ARG T_VERSION=1.8.2
 WORKDIR /code
 ADD .env .env
