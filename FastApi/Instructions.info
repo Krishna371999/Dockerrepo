@@ -1,0 +1,2 @@
+# docker build -t sreeharshav/multistage:v1 --progress=plain -f Dockerfile.Multistage .
+# docker build -t sreeharshav/multistage:v1 --progress=plain -f Dockerfile.Multistage <foldername>

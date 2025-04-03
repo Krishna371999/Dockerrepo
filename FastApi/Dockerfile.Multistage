@@ -1,0 +1,45 @@
+#Stage For Installing Python & APT Dependencies
+FROM python:3.11 as build-stage
+COPY requirements.txt requirements.txt
+WORKDIR /code
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt \
+    && apt update && apt install -y unzip --allow-unauthenticated
+ARG T_VERSION=1.7.4
+ADD https://releases.hashicorp.com/terraform/${T_VERSION}/terraform_${T_VERSION}_linux_amd64.zip terraform.zip
+RUN unzip terraform.zip -d /usr/local/bin
+RUN rm -rf terraform.zip
+
+#Stage For Trivy Vulerability Scanner
+FROM python:3.11 as scanning-stage
+LABEL app="BOTO3 with FastAPI"
+WORKDIR /code
+COPY --from=build-stage /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=build-stage /usr/local/bin /usr/local/bin
+COPY main.py main.py
+ADD Instructions.info Instructions.txt
+COPY --from=aquasec/trivy:latest /usr/local/bin/trivy /usr/local/bin/trivy
+RUN trivy filesystem --scanners vuln,secret,misconfig --exit-code 0 --no-progress /
+
+#Stage For Building Image
+FROM python:3.11 as image-stage
+LABEL app="BOTO3 with FastAPI"
+COPY --from=scanning-stage /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=scanning-stage /usr/local/bin /usr/local/bin
+COPY --from=scanning-stage /code /code
+WORKDIR /code
+RUN terraform version
+EXPOSE 80
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0"]
+CMD ["--port", "80"]
+
+
+#If you get a bookwork security issue pefrom the following steps
+#docker system prune -a
+
+# root@ip-10-40-1-201:~/DockerBuild# docker images
+# REPOSITORY            TAG       IMAGE ID       CREATED              SIZE
+# sreeharshav/fastapi   v2        c807a250e21d   18 seconds ago       1.27GB
+# sreeharshav/fastapi   v1        ad68e8c083c7   About a minute ago   1.28GB
+
+# docker build -t sreeharshav/multistage:v1 --progress=plain -f Dockerfile.Multistage .
