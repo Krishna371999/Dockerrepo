@@ -1,0 +1,28 @@
+docker ps # To view the containers
+docker ps -aq # To view the all running containers
+docker images # To view the images
+docker stop <container_name> #Stops the running container.
+docker start <container_name> #starts the container
+docker attach <container_name> #moves into interactive mode of container created.
+####################################################################################################33
+
+##pull a image from dockerhub
+docker pull centos:latest #this will pull the image from docker hub.
+
+###Step 1: Create container from Image
+docker run -d --name app1 -p 80:80 centos:latest
+
+###Step2: Create Image from running container
+docker commit <container name> <new image name>
+### Create new container from above image
+docker run -it --name <new cont name> <$new image name> /bin/bash
+
+###To inspect image
+docker image inspect <Image_name>
+
+
+docker build --progress=plain -t lannicont
+What --progress=plain does:
+It forces Docker to show all logs in a simple, line-by-line format—with no animations, no truncation, no overwriting lines.
+docker build --progress=plain --no-cache -t lanniimg . #To remove Cache
+ docker run -d --name app1 -p 80:80 lanniimg
