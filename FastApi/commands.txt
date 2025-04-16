@@ -4,6 +4,8 @@ docker images # To view the images
 docker stop <container_name> #Stops the running container.
 docker start <container_name> #starts the container
 docker attach <container_name> #moves into interactive mode of container created.
+docker rmi $(dockerimages -aq) --force #Remove all the images available.
+docker rm $(docker ps -aq) --force #Removes all the available containers.
 ####################################################################################################33
 
 ##pull a image from dockerhub
