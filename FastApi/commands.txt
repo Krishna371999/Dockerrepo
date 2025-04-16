@@ -8,11 +8,14 @@ docker rmi $(dockerimages -aq) --force #Remove all the images available.
 docker rm $(docker ps -aq) --force #Removes all the available containers.
 docker exec -it <container_name> bash #It will take inside your computer.
 docker system prune -a  # Important Notes:
-Images that you built but are not currently used by any container will be removed.
+         Images that you built but are not currently used by any container will be removed.
+         Stopped containers (maybe used for debugging or backups) will be gone.
+         It does not delete volumes unless you explicitly add the --volumes flag.
 
-Stopped containers (maybe used for debugging or backups) will be gone.
-
-It does not delete volumes unless you explicitly add the --volumes flag.
+docker build -t tyrion/h:v1 -f Dockerfile.Multistage . #Declaring specific file in current folder to build.
+         here above "." says that we need to copy/add files from current directory from where we are running the command.
+        for ex: we have files in differant folder not in current folder where we are running actually then we have specify folder name specifically as mentioned below.
+docker build -t tyrion/h:v1 -f Dockerfile.Multistage <folder_name>
 ####################################################################################################33
 
 ##pull a image from dockerhub
