@@ -1,3 +1,13 @@
+Diff b/w VM's vd Containers?
+Virtual Machines (VMs) and Containers are both technologies used to run applications in isolated environments, 
+but they differ significantly in architecture and efficiency. 
+VMs emulate entire physical machines using a hypervisor, with each VM running its own operating system along with
+ the application and its dependencies, resulting in higher resource usage, longer startup times, and larger sizes. 
+ In contrast, containers run on a shared host operating system and use a container runtime like Docker to isolate 
+ applications at the process level, making them lightweight, faster to start, and more portable. 
+ Containers are ideal for microservices and cloud-native applications due to their efficiency and ease of deployment, 
+ while VMs are better suited for running multiple operating systems or applications requiring strong isolation and full OS environments.
+
 docker ps # To view the containers
 docker ps -aq # To view the all running containers
 docker images # To view the images
@@ -38,3 +48,93 @@ What --progress=plain does:
 It forces Docker to show all logs in a simple, line-by-line format—with no animations, no truncation, no overwriting lines.
 docker build --progress=plain --no-cache -t lanniimg . #To remove Cache
  docker run -d --name app1 -p 80:80 lanniimg
+
+
+ What is docker Swarm?
+     Docker Swarm is a native clustering and orchestration tool for Docker. 
+     It lets you group multiple Docker hosts (machines) into a single virtual server, called a Swarm, 
+     so you can deploy and manage your containerized applications more easily.
+
+     for example for easy under standing of docker swarm:
+     Imagine This: A Pizza Delivery Company
+        You run a pizza company with one main office (manager) and several delivery branches (workers). You get lots of orders (users sending traffic), and you want to make sure:
+        Orders are assigned to the right branch
+        If one branch goes down, another picks up the job
+        You can easily add more branches when demand increases
+        That’s what Docker Swarm does — but with containers instead of pizza orders.
+        💡 What is Docker Swarm?
+        Docker Swarm is a tool that turns a bunch of Docker machines into one unified system.
+        
+        It automatically manages where containers run
+        
+        It spreads out the load
+        
+        It recovers from failures
+        
+        It scales easily
+
+Steps for Real-Life Work?
+Step1:
+ check whether the swarm is available or not if not then install
+ Command used for checking the swarm availability:
+
+ docker info | grep -i "swarm"
+
+ If the status is active then swarm is available in it if not you need to initilize itby below command:
+
+  docker swarm initilize
+
+know we need to create a cluster by adding the nodes the firdt node where iam working as is a leader node and we need to add master and worker nodes.
+for that command:
+
+docker swarm join-token
+
+By giving above commnad it will show 2 options as Manager/Worker
+
+by giving as manager:
+
+docker swarm join-token manager <it will generate a token taken that token and paste it in the node where it is need to add in cluster as manager node>
+
+If we give worker in place of manager it will give one token for worker node code it and paste it on node which acts as worker node.
+
+Command used to check which servers are managers and which servers are workers:
+
+docker node ls
+
+To create container's in docker swarm we have 2 modes:
+1. Replica(In K8S we will call it as Deployment)
+2. Global(In K8S we will call it as Daemon set)
+
+1. Replica mode
+    Application deployment will be done in the cluster servers if in case we drain any of the application in particular
+    server in cluster it will available again over there.
+    If incase if we add it again then also it will not revert back either it can move on to another server.
+
+    Command to create in Replica Mode(From Leader node):
+
+    docker service create --name app1 --publish 8000:80 --replicas 4 nginx:latest
+
+    By giving this it will create 4 containers and distrubute among the cluster.
+
+Command used to drain the particular node container: 
+ 
+    docker node update --availability drain <ip of that node which is to be drained>
+
+Command used to make active the particular node from drained state:
+
+    docker node update --availability active <ip of the server>
+
+Once we make active also it will not the data will not come back again into server in replica mode.
+So, to overcome the issue we use global mode:
+
+The drain state in server we can see this by running docker visualizer command which os available in leture class:
+
+Global Mode:
+
+docker service create --name monitor --mode global --publish 8000:80 ubuntu:latest
+
+I will also create container in the cluster parllely i all nodes but once we drain any node and get back again
+to active state it will recover again and available(only if the container is created in global mode).
+
+
+
